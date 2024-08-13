@@ -1,0 +1,13 @@
+function exp_series(x)
+  term = 1.0  
+  sum = 1.0  
+  n = 1
+  while term > eps(sum)
+      term *= x / n
+      sum += term
+      n += 1
+  end
+  return sum
+end
+
+println(exp_series(1)) 
