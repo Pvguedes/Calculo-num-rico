@@ -1,0 +1,84 @@
+using .MathConstants:e
+
+function fixedpoint(a, g, error)
+  x = g(a)
+  while abs(x-a) > error
+    a = x
+    x = g(a)
+  end
+  return x
+end
+
+g(x) = log(x+2)
+error = 10^-8
+r = fixedpoint(1.1, g, error)
+println("valor: $r")
+
+# Exercício 3.3.1
+g(x) = e^x-2
+r = fixedpoint(1.8, g, error)
+println(r)
+
+function secant(a, b, f, error)
+  g(a, b) = (a*f(b)-b*f(a))/(f(b)-f(a))
+  x = g(a, b)
+  while abs(x-b) > error
+    a = b
+    b = x
+    x = g(a, b)
+  end
+  return x
+end
+
+f(x) = e^x-x-2
+r = secant(1.1, 1.2, f, error)
+println("solução aproximada: $r")
+r = secant(-1.8, -1.9, f, error)
+println("solução aproximada: $r")
+
+
+#EXERCÍCIO 3.4.1
+error = 10^-5
+g(x) = x+((cos(x)-(x^2))/(sin(x)+(2*x)))
+r = fixedpoint(1, g, error)
+println("solução aproximada: $r")
+
+#EXERCÍCIO 3.6.3
+f(x) = exp(-x^2) - 2x
+
+function secante(x0, x1, tol, max_iter)
+    for i in 1:max_iter
+        f_x0 = f(x0)
+        f_x1 = f(x1)
+        x2 = x1 - f_x1 * (x1 - x0) / (f_x1 - f_x0)
+        abs(x2 - x1) < tol && return x2
+        x0, x1 = x1, x2
+    end
+    error("Convergência não alcançada.")
+end
+
+x0 = 0.5
+x1 = 1.0
+solucao = secante(x0, x1, 1e-5, 1000)
+println("Solução aproximada: $solucao")
+
+
+#EXERCÍCIO 3.6.4
+Ir = 10^-12
+T = 300
+k = 1.380649*(10^-23)
+q = 1.60217663*(10^-19)
+I(x) = Ir*(e^((x*q)/(k*T)) - 1)
+dI(x) = ((Ir*q)/(k*T))*e^((x*q)/(k*T))
+g(x,V,R) = R*I(x) + x - V
+dg(x,R) = R*dI(x) + 1
+d(x,R,f) = x - (f(x)/dg(x,R)) 
+error = 10^-3
+
+# ((10^3)*(10^-12)*(e^((x*(1.60217663*10^-19))/((1.380649*10^-23)*(300)))-1))+x-30
+f(x) = g(x, 30, 10^3)
+h(x) = d(x, 10^3, f)
+r = fixedpoint(0.6, h, error)
+println("método de newton: $r")
+r = secant(0.6, 0.7, f, error)
+println("método das secantes: $r")
